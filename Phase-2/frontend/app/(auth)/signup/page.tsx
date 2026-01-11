@@ -15,8 +15,33 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { signupSchema, SignupInput } from '@/lib/validations';
 import { authAPI } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
-import { fadeInUp } from '@/lib/animations';
-import { LoadingOverlay, ButtonLoading } from '@/components/ui/LoadingComponents';
+import { LoadingOverlay } from '@/components/ui/LoadingComponents';
+import { ThemeToggle } from '@/components/ThemeToggle';
+
+// Swipe right to left animation
+const slideInFromRight = {
+  hidden: {
+    x: 100,
+    opacity: 0,
+  },
+  visible: {
+    x: 0,
+    opacity: 1,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+      damping: 15,
+      duration: 0.6,
+    },
+  },
+  exit: {
+    x: -100,
+    opacity: 0,
+    transition: {
+      duration: 0.3,
+    },
+  },
+};
 
 export default function SignupPage() {
   const router = useRouter();
@@ -68,11 +93,16 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Theme Toggle - Fixed Position */}
+      <div className="absolute top-4 right-4 z-20">
+        <ThemeToggle />
+      </div>
+
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-40 left-40 w-80 h-80 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 dark:opacity-30 animate-blob"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 dark:opacity-30 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-40 left-40 w-80 h-80 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 dark:opacity-30 animate-blob animation-delay-4000"></div>
       </div>
 
       <LoadingOverlay show={isLoading} message="Creating account..." />
@@ -80,13 +110,17 @@ export default function SignupPage() {
       <motion.div
         initial="hidden"
         animate="visible"
-        variants={fadeInUp}
+        exit="exit"
+        variants={slideInFromRight}
         className="w-full max-w-md relative z-10"
       >
-        <Card className="backdrop-blur-md bg-white/10 border-white/20 shadow-2xl">
+        <Card className="backdrop-blur-md bg-white/80 dark:bg-white/10 border-gray-200 dark:border-white/20 shadow-2xl">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-white">Create Account</CardTitle>
-            <CardDescription className="text-gray-300">
+            <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-cyan-500 to-purple-500 bg-clip-text text-transparent mb-2 block">
+              TaskMaster Pro
+            </Link>
+            <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">Create Account</CardTitle>
+            <CardDescription className="text-gray-600 dark:text-gray-300">
               Sign up to start managing your tasks
             </CardDescription>
           </CardHeader>
@@ -99,11 +133,11 @@ export default function SignupPage() {
               )}
 
               <div className="space-y-2 relative">
-                <Label htmlFor="name" className="text-gray-200">Full Name</Label>
+                <Label htmlFor="name" className="text-gray-700 dark:text-gray-200">Full Name</Label>
                 <Input
                   id="name"
                   placeholder="Enter your full name"
-                  className="bg-white/5 border-white/20 text-white placeholder:text-gray-400 py-6"
+                  className="bg-gray-100 dark:bg-white/5 border-gray-300 dark:border-white/20 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 py-6"
                   {...register('name')}
                   disabled={isSubmitting}
                 />
@@ -113,12 +147,12 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-2 relative">
-                <Label htmlFor="email" className="text-gray-200">Email</Label>
+                <Label htmlFor="email" className="text-gray-700 dark:text-gray-200">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="Enter your email"
-                  className="bg-white/5 border-white/20 text-white placeholder:text-gray-400 py-6"
+                  className="bg-gray-100 dark:bg-white/5 border-gray-300 dark:border-white/20 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 py-6"
                   {...register('email')}
                   disabled={isSubmitting}
                 />
@@ -128,20 +162,20 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-2 relative">
-                <Label htmlFor="password" className="text-gray-200">Password</Label>
+                <Label htmlFor="password" className="text-gray-700 dark:text-gray-200">Password</Label>
                 <div className="relative">
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="Create a strong password"
-                    className="bg-white/5 border-white/20 text-white placeholder:text-gray-400 py-6 pr-12"
+                    className="bg-gray-100 dark:bg-white/5 border-gray-300 dark:border-white/20 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 py-6 pr-12"
                     {...register('password')}
                     disabled={isSubmitting}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors"
                   >
                     {showPassword ? (
                       <EyeOff className="h-5 w-5" />
@@ -156,20 +190,20 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-2 relative">
-                <Label htmlFor="confirmPassword" className="text-gray-200">Confirm Password</Label>
+                <Label htmlFor="confirmPassword" className="text-gray-700 dark:text-gray-200">Confirm Password</Label>
                 <div className="relative">
                   <Input
                     id="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="Confirm your password"
-                    className="bg-white/5 border-white/20 text-white placeholder:text-gray-400 py-6 pr-12"
+                    className="bg-gray-100 dark:bg-white/5 border-gray-300 dark:border-white/20 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 py-6 pr-12"
                     {...register('confirmPassword')}
                     disabled={isSubmitting}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors"
                   >
                     {showConfirmPassword ? (
                       <EyeOff className="h-5 w-5" />
@@ -183,29 +217,27 @@ export default function SignupPage() {
                 )}
               </div>
 
-              <label className="flex items-start space-x-2 text-gray-300 cursor-pointer">
+              <label className="flex items-start space-x-2 text-gray-600 dark:text-gray-300 cursor-pointer">
                 <input type="checkbox" className="form-checkbox h-4 w-4 text-primary rounded mt-0.5" />
                 <span>I agree to the <Link href="#" className="text-primary hover:underline">Terms & Conditions</Link></span>
               </label>
 
-              <ButtonLoading isLoading={isSubmitting}>
-                <Button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white py-6 text-lg font-semibold"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Creating account...
-                    </>
-                  ) : (
-                    'Sign Up'
-                  )}
-                </Button>
-              </ButtonLoading>
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white py-6 text-lg font-semibold transition-all duration-300"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating account...
+                  </>
+                ) : (
+                  'Sign Up'
+                )}
+              </Button>
 
-              <div className="text-center text-gray-300 text-sm">
+              <div className="text-center text-gray-600 dark:text-gray-300 text-sm">
                 <p>Already have an account?{' '}
                   <Link href="/login" className="text-primary hover:underline font-semibold">
                     Log in
@@ -216,24 +248,24 @@ export default function SignupPage() {
               <div className="mt-6">
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-white/20" />
+                    <div className="w-full border-t border-gray-300 dark:border-white/20" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                    <span className="bg-white dark:bg-transparent px-2 text-gray-500 dark:text-muted-foreground">Or continue with</span>
                   </div>
                 </div>
                 <div className="mt-4 grid grid-cols-2 gap-3">
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full border-white/20 text-white hover:bg-white/10 py-6"
+                    className="w-full border-gray-300 dark:border-white/20 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 py-6"
                   >
                     Google
                   </Button>
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full border-white/20 text-white hover:bg-white/10 py-6"
+                    className="w-full border-gray-300 dark:border-white/20 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 py-6"
                   >
                     GitHub
                   </Button>
