@@ -284,7 +284,7 @@ export default function DashboardPage() {
               {tasks.map((task) => (
                 <div
                   key={task.id}
-                  className={`${taskLoadingStates[task.id] ? 'opacity-70 pointer-events-none' : ''} transition-opacity`
+                  className={`${taskLoadingStates[task.id] ? 'opacity-70 pointer-events-none' : ''} transition-opacity`}
                 >
                   <TaskCard
                     id={task.id}
