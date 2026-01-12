@@ -18,7 +18,7 @@ class User(SQLModel, table=True):
 class Task(SQLModel, table=True):
     __tablename__ = "tasks"
 
-    id: str = Field(default_factory=lambda: str(uuid4()), primary_key=True)
+    id: Optional[int] = Field(default=None, primary_key=True)
     user_id: str = Field(foreign_key="users.id", index=True)
     title: str = Field(max_length=255)
     description: Optional[str] = Field(default=None)

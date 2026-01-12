@@ -28,7 +28,7 @@ class TaskCreate(BaseModel):
     description: Optional[str] = Field(None, max_length=2000)
 
 class TaskResponse(BaseModel):
-    id: str
+    id: int
     user_id: str
     title: str
     description: Optional[str]

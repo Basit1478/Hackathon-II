@@ -1,5 +1,4 @@
 from datetime import datetime
-from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlmodel import Session, select
 from typing import Optional
@@ -11,7 +10,7 @@ from ..deps import get_current_user
 
 router = APIRouter(prefix="/api", tags=["Tasks"])
 
-def verify_user_access(user_id: UUID, current_user: User):
+def verify_user_access(user_id: str, current_user: User):
     """Verify that the requested user_id matches the authenticated user"""
     if user_id != current_user.id:
         raise HTTPException(
@@ -21,7 +20,7 @@ def verify_user_access(user_id: UUID, current_user: User):
 
 @router.get("/{user_id}/tasks", response_model=TaskListResponse)
 async def get_tasks(
-    user_id: UUID,
+    user_id: str,
     status: Optional[str] = Query(None, regex="^(all|completed|pending)$"),
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session)
@@ -52,7 +51,7 @@ async def get_tasks(
 
 @router.post("/{user_id}/tasks", response_model=TaskResponse, status_code=status.HTTP_201_CREATED)
 async def create_task(
-    user_id: UUID,
+    user_id: str,
     request: TaskCreate,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session)
@@ -81,8 +80,8 @@ async def create_task(
 
 @router.patch("/{user_id}/tasks/{task_id}/complete", response_model=TaskResponse)
 async def toggle_task_complete(
-    user_id: UUID,
-    task_id: UUID,
+    user_id: str,
+    task_id: int,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
@@ -117,8 +116,8 @@ async def toggle_task_complete(
 
 @router.delete("/{user_id}/tasks/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_task(
-    user_id: UUID,
-    task_id: UUID,
+    user_id: str,
+    task_id: int,
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
