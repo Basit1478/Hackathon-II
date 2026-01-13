@@ -25,7 +25,7 @@ app = FastAPI(
 )
 
 # CORS configuration
-origins = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
+origins = os.getenv("CORS_ORIGINS", "https://frontend-gamma-red.vercel.app/").split(",")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -45,3 +45,4 @@ async def health_check():
 @app.get("/")
 async def root():
     return {"message": "TaskFlow Pro API", "version": "1.0.0"}
+
