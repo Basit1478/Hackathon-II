@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://hackathon-ii-the-evolution-of-todo-u0ci.onrender.com';
 
 console.log('API_URL configured as:', API_URL);
 
