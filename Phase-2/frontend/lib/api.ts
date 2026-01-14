@@ -74,6 +74,10 @@ export const tasksAPI = {
     const response = await api.post(`/api/${userId}/tasks`, data);
     return response.data;
   },
+  updateTask: async (userId: string, taskId: string, data: { title: string; description?: string }) => {
+    const response = await api.put(`/api/${userId}/tasks/${taskId}`, data);
+    return response.data;
+  },
   deleteTask: async (userId: string, taskId: string) => {
     await api.delete(`/api/${userId}/tasks/${taskId}`);
   },
