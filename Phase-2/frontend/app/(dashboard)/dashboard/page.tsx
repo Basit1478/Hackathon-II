@@ -8,6 +8,7 @@ import { LogOut, CheckCircle2, ListTodo } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TaskCard } from '@/components/tasks/TaskCard';
 import { CreateTaskModal } from '@/components/tasks/CreateTaskModal';
+import { EditTaskModal } from '@/components/tasks/EditTaskModal';
 import { useAuthStore } from '@/store/authStore';
 import { tasksAPI } from '@/lib/api';
 import { staggerContainer, fadeInUp } from '@/lib/animations';
@@ -34,6 +35,8 @@ export default function DashboardPage() {
   const [taskLoadingStates, setTaskLoadingStates] = useState<Record<string, boolean>>({});
   const [progress, setProgress] = useState(0);
   const [showProgressBar, setShowProgressBar] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<{ id: string; title: string; description: string | null } | null>(null);
 
   useEffect(() => {
     initialize();
@@ -186,6 +189,47 @@ export default function DashboardPage() {
     }
   };
 
+  const handleEditTask = (taskId: string, title: string, description: string | null) => {
+    setEditingTask({ id: taskId, title, description });
+    setEditModalOpen(true);
+  };
+
+  const handleUpdateTask = async (taskId: string, data: CreateTaskInput) => {
+    if (!user) return;
+
+    // Show progress bar during task update
+    setProgress(0);
+    setShowProgressBar(true);
+    const interval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 90) {
+          clearInterval(interval);
+          return prev;
+        }
+        return prev + 15;
+      });
+    }, 100);
+
+    try {
+      await tasksAPI.updateTask(user.id, taskId, data);
+      await loadTasks(); // Reload tasks after update
+
+      // Complete progress
+      setTimeout(() => {
+        setProgress(100);
+        setTimeout(() => {
+          setShowProgressBar(false);
+          setProgress(0);
+        }, 300);
+      }, 200);
+    } catch (err) {
+      console.error('Error updating task:', err);
+      setShowProgressBar(false);
+      setProgress(0);
+      throw err;
+    }
+  };
+
   const handleLogout = () => {
     logout();
     router.push('/login');
@@ -293,6 +337,7 @@ export default function DashboardPage() {
                     completed={task.completed}
                     onToggle={handleToggleComplete}
                     onDelete={handleDeleteTask}
+                    onEdit={handleEditTask}
                   />
                 </div>
               ))}
@@ -302,6 +347,18 @@ export default function DashboardPage() {
 
         {/* Create Task FAB */}
         <CreateTaskModal onSubmit={handleCreateTask} />
+
+        {/* Edit Task Modal */}
+        {editingTask && (
+          <EditTaskModal
+            open={editModalOpen}
+            onOpenChange={setEditModalOpen}
+            taskId={editingTask.id}
+            initialTitle={editingTask.title}
+            initialDescription={editingTask.description}
+            onSubmit={handleUpdateTask}
+          />
+        )}
       </motion.div>
     </div>
   );
