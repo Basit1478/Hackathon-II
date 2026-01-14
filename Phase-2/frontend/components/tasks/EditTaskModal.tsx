@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Loader2, X } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,17 +16,27 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import { createTaskSchema, CreateTaskInput } from '@/lib/validations';
 import { scaleIn } from '@/lib/animations';
 
-interface CreateTaskModalProps {
-  onSubmit: (data: CreateTaskInput) => Promise<void>;
+interface EditTaskModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  taskId: string;
+  initialTitle: string;
+  initialDescription: string | null;
+  onSubmit: (taskId: string, data: CreateTaskInput) => Promise<void>;
 }
 
-export function CreateTaskModal({ onSubmit }: CreateTaskModalProps) {
-  const [open, setOpen] = useState(false);
+export function EditTaskModal({
+  open,
+  onOpenChange,
+  taskId,
+  initialTitle,
+  initialDescription,
+  onSubmit,
+}: EditTaskModalProps) {
   const [error, setError] = useState<string | null>(null);
 
   const {
@@ -36,30 +46,34 @@ export function CreateTaskModal({ onSubmit }: CreateTaskModalProps) {
     formState: { errors, isSubmitting },
   } = useForm<CreateTaskInput>({
     resolver: zodResolver(createTaskSchema),
+    defaultValues: {
+      title: initialTitle,
+      description: initialDescription || undefined,
+    },
   });
+
+  useEffect(() => {
+    if (open) {
+      reset({
+        title: initialTitle,
+        description: initialDescription || undefined,
+      });
+      setError(null);
+    }
+  }, [open, initialTitle, initialDescription, reset]);
 
   const handleFormSubmit = async (data: CreateTaskInput) => {
     try {
       setError(null);
-      await onSubmit(data);
-      reset();
-      setOpen(false);
+      await onSubmit(taskId, data);
+      onOpenChange(false);
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to create task');
+      setError(err.response?.data?.detail || 'Failed to update task');
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg bg-primary hover:bg-primary/90 animate-glow"
-          size="icon"
-          aria-label="Create new task"
-        >
-          <Plus className="h-6 w-6" />
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <AnimatePresence>
         {open && (
           <DialogContent className="backdrop-blur-md bg-white/95 dark:bg-slate-900/90 border-gray-300 dark:border-white/20 sm:max-w-md">
@@ -70,9 +84,9 @@ export function CreateTaskModal({ onSubmit }: CreateTaskModalProps) {
               variants={scaleIn}
             >
               <DialogHeader>
-                <DialogTitle className="text-gray-900 dark:text-white">Create New Task</DialogTitle>
+                <DialogTitle className="text-gray-900 dark:text-white">Edit Task</DialogTitle>
                 <DialogDescription className="text-gray-600 dark:text-gray-400">
-                  Add a new task to your list
+                  Update your task details
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4 mt-4">
@@ -83,9 +97,9 @@ export function CreateTaskModal({ onSubmit }: CreateTaskModalProps) {
                 )}
 
                 <div className="space-y-2">
-                  <Label htmlFor="title" className="text-gray-700 dark:text-gray-200">Title</Label>
+                  <Label htmlFor="edit-title" className="text-gray-700 dark:text-gray-200">Title</Label>
                   <Input
-                    id="title"
+                    id="edit-title"
                     placeholder="What needs to be done?"
                     className="bg-white dark:bg-white/5 border-gray-300 dark:border-white/20 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400"
                     {...register('title')}
@@ -96,11 +110,11 @@ export function CreateTaskModal({ onSubmit }: CreateTaskModalProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description" className="text-gray-700 dark:text-gray-200">
+                  <Label htmlFor="edit-description" className="text-gray-700 dark:text-gray-200">
                     Description (optional)
                   </Label>
                   <Textarea
-                    id="description"
+                    id="edit-description"
                     placeholder="Add some details..."
                     className="bg-white dark:bg-white/5 border-gray-300 dark:border-white/20 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 min-h-[100px]"
                     {...register('description')}
@@ -114,7 +128,7 @@ export function CreateTaskModal({ onSubmit }: CreateTaskModalProps) {
                   <Button
                     type="button"
                     variant="ghost"
-                    onClick={() => setOpen(false)}
+                    onClick={() => onOpenChange(false)}
                     className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
                   >
                     Cancel
@@ -127,10 +141,10 @@ export function CreateTaskModal({ onSubmit }: CreateTaskModalProps) {
                     {isSubmitting ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Creating...
+                        Updating...
                       </>
                     ) : (
-                      'Create Task'
+                      'Update Task'
                     )}
                   </Button>
                 </div>
