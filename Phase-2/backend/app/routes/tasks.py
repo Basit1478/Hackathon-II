@@ -78,6 +78,46 @@ async def create_task(
         updated_at=task.updated_at
     )
 
+@router.put("/{user_id}/tasks/{task_id}", response_model=TaskResponse)
+async def update_task(
+    user_id: str,
+    task_id: int,
+    request: TaskCreate,
+    current_user: User = Depends(get_current_user),
+    session: Session = Depends(get_session)
+):
+    """Update an existing task's title and description"""
+    verify_user_access(user_id, current_user)
+
+    task = session.exec(
+        select(Task).where(Task.id == task_id, Task.user_id == user_id)
+    ).first()
+
+    if not task:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Task not found"
+        )
+
+    # Update task fields
+    task.title = request.title
+    task.description = request.description
+    task.updated_at = datetime.utcnow()
+
+    session.add(task)
+    session.commit()
+    session.refresh(task)
+
+    return TaskResponse(
+        id=task.id,
+        user_id=task.user_id,
+        title=task.title,
+        description=task.description,
+        completed=task.completed,
+        created_at=task.created_at,
+        updated_at=task.updated_at
+    )
+
 @router.patch("/{user_id}/tasks/{task_id}/complete", response_model=TaskResponse)
 async def toggle_task_complete(
     user_id: str,
