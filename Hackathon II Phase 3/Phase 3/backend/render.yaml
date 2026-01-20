@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: taskmaster-pro-ai-backend
+    runtime: python
+    repo: https://github.com/Basit1478/Hackathon-II-The-Evolution-Of-Todo.git
+    branch: 001-task-management
+    rootDir: Hackathon II Phase 3/Phase 3/backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: PYTHON_VERSION
+        value: 3.11.0
+    healthCheckPath: /health
+    autoDeploy: true
