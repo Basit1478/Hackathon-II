@@ -1,0 +1,13 @@
+{
+  "name": "taskmaster-frontend",
+  "framework": "nextjs",
+  "git": {
+    "deploymentEnabled": false
+  },
+  "env": {
+    "NEXT_PUBLIC_API_URL": {
+      "source": "plain",
+      "value": "https://taskmaster-backend.onrender.com"
+    }
+  }
+}
