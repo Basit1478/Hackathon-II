@@ -1,28 +1,57 @@
-# Deployment Guide
+# Deployment Instructions
 
 ## Backend Deployment (Render)
 
-1. Create a new Web Service on Render
-2. Connect your GitHub repository
-3. Set root directory to `Phase-3/backend`
-4. Build command: `pip install -r requirements.txt`
-5. Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-6. Add environment variables:
-   - `DATABASE_URL`
-   - `GEMINI_API_KEY`
-   - `JWT_SECRET`
-   - `CORS_ORIGINS`
+### Prerequisites
+- Render account
+- GitHub repository for the backend code
+
+### Steps
+1. Push backend code to GitHub repository
+2. Connect repository to Render
+3. Create a new Web Service with these settings:
+   - Name: `taskmaster-backend`
+   - Runtime: Python
+   - Build Command: `pip install -r requirements.txt`
+   - Start Command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+   - Environment Variables:
+     - `DATABASE_URL`: Your Neon database connection string
+     - `GEMINI_API_KEY`: Your Google Gemini API key
+     - `JWT_SECRET`: Your JWT secret key
 
 ## Frontend Deployment (Vercel)
 
-1. Import project from GitHub
-2. Set root directory to `Phase-3/frontend`
-3. Framework preset: Next.js
-4. Add environment variable:
-   - `NEXT_PUBLIC_API_URL` = your Render backend URL
+### Prerequisites
+- Vercel account
+- GitHub repository for the frontend code
 
-## Database (Neon)
+### Steps
+1. Push frontend code to GitHub repository
+2. Import project in Vercel
+3. Configure these settings:
+   - Framework Preset: Next.js
+   - Environment Variables:
+     - `NEXT_PUBLIC_API_URL`: Your backend URL (e.g., https://taskmaster-backend.onrender.com)
 
-1. Create a Neon project
-2. Copy the connection string
-3. Use in backend's DATABASE_URL environment variable
+## Environment Configuration
+
+### Backend (.env)
+```
+DATABASE_URL=postgresql://user:password@host/database
+GEMINI_API_KEY=your-gemini-api-key
+JWT_SECRET=your-jwt-secret-change-in-production
+CORS_ORIGINS=["https://your-frontend-url.vercel.app"]
+```
+
+### Frontend (.env.local)
+```
+NEXT_PUBLIC_API_URL=https://your-backend-url.onrender.com
+```
+
+## Testing After Deployment
+
+1. Visit your frontend URL
+2. The chat interface should load
+3. Try sending a message like "Add buy groceries"
+4. The AI should respond and create a task
+5. Verify tasks can be listed, completed, updated, and deleted
