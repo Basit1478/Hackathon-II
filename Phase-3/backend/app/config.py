@@ -3,6 +3,7 @@ from pydantic import field_validator
 from functools import lru_cache
 from typing import Union
 
+
 class Settings(BaseSettings):
     database_url: str = "postgresql+asyncpg://user:pass@localhost/taskmaster"
     gemini_api_key: str = ""
@@ -30,18 +31,7 @@ class Settings(BaseSettings):
         env_file = ".env"
         env_file_encoding = "utf-8"
 
+
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
-```
-
-## Then in Render
-
-Set `CORS_ORIGINS` as a simple comma-separated string:
-```
-CORS_ORIGINS=https://taskmaster-frontend-pi.vercel.app,http://localhost:3000
-```
-
-Or if you only need the production URL:
-```
-CORS_ORIGINS=https://taskmaster-frontend-pi.vercel.app
