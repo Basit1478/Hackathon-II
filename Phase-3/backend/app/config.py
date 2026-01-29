@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     cors_origins: list[str] = [
         "http://localhost:3000",
-        "https://taskmaster-frontend-pi.vercel.app"
+        "https://697b8b6c64c11838507c5fcd--001-ai-2.netlify.app"
     ]
     better_auth_secret: str = ""
     
