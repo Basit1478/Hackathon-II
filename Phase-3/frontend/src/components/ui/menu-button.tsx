@@ -32,7 +32,13 @@ export function MenuButton({
   actions
 }: MenuButtonProps) {
   // Default actions if none provided
-  const defaultActions = actions || [
+  const defaultActions: Array<{
+    label?: string;
+    icon?: React.ComponentType<{ className?: string }>;
+    onClick?: () => void;
+    danger?: boolean;
+    separator?: boolean;
+  }> = actions || [
     { label: "New Chat", icon: MessageSquare },
     { label: "New Task", icon: FileText },
     { label: "Settings", icon: Settings },
@@ -65,7 +71,7 @@ export function MenuButton({
               <DropdownMenuItem
                 key={index}
                 className={action.danger ? "text-red-600" : ""}
-                onSelect={action.onClick}
+                onSelect={() => action.onClick?.()}
               >
                 <IconComponent className="mr-2 h-4 w-4" />
                 <span>{action.label}</span>
