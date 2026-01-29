@@ -10,6 +10,6 @@ class Task(SQLModel, table=True):
     user_id: str = Field(index=True)
     title: str = Field(max_length=200)
     description: Optional[str] = Field(default=None)
-    status: str = Field(default="pending", index=True)
+    status: str = Field(default="pending", index=True)  # "pending" or "completed"
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
