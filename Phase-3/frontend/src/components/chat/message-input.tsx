@@ -1,15 +1,22 @@
 "use client";
 
-import { useState, KeyboardEvent } from "react";
+import { useState, KeyboardEvent, useRef, useEffect } from "react";
 import { Send } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface MessageInputProps {
   onSend: (content: string) => void;
   disabled: boolean;
+  placeholder?: string;
 }
 
-export function MessageInput({ onSend, disabled }: MessageInputProps) {
+export function MessageInput({ 
+  onSend, 
+  disabled,
+  placeholder = "Type your message..." 
+}: MessageInputProps) {
   const [value, setValue] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSubmit = () => {
     if (value.trim() && !disabled) {
@@ -18,35 +25,53 @@ export function MessageInput({ onSend, disabled }: MessageInputProps) {
     }
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit();
     }
   };
 
+  // Auto-resize textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
+    }
+  }, [value]);
+
   return (
-    <div className="border-t border-secondary-200 bg-white/70 backdrop-blur-xl dark:border-secondary-700 dark:bg-secondary-900/70">
-      <div className="container mx-auto p-4">
-        <div className="flex gap-3">
-          <input
-            type="text"
+    <div className="sticky bottom-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-t border-gray-200 dark:border-gray-700 p-4">
+      <div className="max-w-3xl mx-auto">
+        <form 
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }} 
+          className="relative"
+        >
+          <textarea
+            ref={textareaRef}
             value={value}
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="What would you like to do today?"
+            placeholder={placeholder}
             disabled={disabled}
-            className="flex-1 rounded-2xl border border-secondary-200 bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-secondary-700 dark:bg-secondary-800 dark:text-white"
+            rows={1}
+            className="w-full resize-none rounded-2xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-3 pr-12 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
           />
-          <button
-            onClick={handleSubmit}
+          <Button
+            type="submit"
+            size="icon"
             disabled={disabled || !value.trim()}
-            className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-500 text-white transition-colors hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Send className="h-4 w-4" />
-          </button>
-        </div>
-        <p className="mt-2 text-center text-xs text-secondary-500">TaskMaster AI understands natural language!</p>
+          </Button>
+        </form>
+        <p className="mt-2 text-center text-xs text-gray-500 dark:text-gray-400">
+          AI can make mistakes. Please verify important information.
+        </p>
       </div>
     </div>
   );
