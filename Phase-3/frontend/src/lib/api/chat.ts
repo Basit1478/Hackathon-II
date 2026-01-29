@@ -1,5 +1,6 @@
 import type { ChatRequest, ChatResponse, Message, Conversation } from "@/types/chat";
 
+// Frontend API URL - use NEXT_PUBLIC prefix for client-side access
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export async function sendMessage(userId: string, conversationId: number | null, message: string): Promise<ChatResponse> {
@@ -23,12 +24,21 @@ export async function getConversations(userId: string): Promise<Conversation[]> 
   const response = await fetch(`${API_URL}/api/${userId}/conversations`);
   if (!response.ok) throw new Error("Failed to fetch conversations");
   const data = await response.json();
-  return data.map((conv: Record<string, string>) => ({ id: conv.id, createdAt: conv.created_at, updatedAt: conv.updated_at }));
+  return data.map((conv: Record<string, string>) => ({ 
+    id: conv.id, 
+    createdAt: conv.created_at, 
+    updatedAt: conv.updated_at 
+  }));
 }
 
 export async function getMessages(userId: string, conversationId: number): Promise<Message[]> {
   const response = await fetch(`${API_URL}/api/${userId}/conversations/${conversationId}/messages`);
   if (!response.ok) throw new Error("Failed to fetch messages");
   const data = await response.json();
-  return data.map((msg: Record<string, string | number>) => ({ id: msg.id, role: msg.role, content: msg.content, createdAt: msg.created_at }));
+  return data.map((msg: Record<string, string | number>) => ({ 
+    id: msg.id, 
+    role: msg.role, 
+    content: msg.content, 
+    createdAt: msg.created_at 
+  }));
 }
