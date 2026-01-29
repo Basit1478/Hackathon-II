@@ -21,24 +21,56 @@ class UpdateTaskOutput(BaseModel):
 
 
 async def update_task_tool(session, input_data: UpdateTaskInput) -> UpdateTaskOutput:
+    """
+    Update a task's title and/or description.
+
+    Args:
+        session: Database session
+        input_data: UpdateTaskInput with user_id, task_id, and fields to update
+
+    Returns:
+        UpdateTaskOutput with task_id and status
+
+    Raises:
+        ValueError: If task not found or doesn't belong to user
+    """
     from app.services.task_service import TaskService
+
     service = TaskService(session)
-    task = await service.update_task(task_id=input_data.task_id, user_id=input_data.user_id, title=input_data.title, description=input_data.description)
+    task = await service.update_task(
+        task_id=input_data.task_id,
+        user_id=input_data.user_id,
+        title=input_data.title,
+        description=input_data.description,
+    )
+
     if not task:
-        raise ValueError(f"Task {input_data.task_id} not found")
-    return UpdateTaskOutput(task_id=task.id, status="updated")
+        raise ValueError(f"Task {input_data.task_id} not found or doesn't belong to user")
+
+    return UpdateTaskOutput(
+        task_id=task.id,
+        status="updated",
+    )
 
 
+# Tool definition for MCP
 TOOL_DEFINITION = {
     "name": "update_task",
-    "description": "Update a task's title or description",
+    "description": "Update a task's title and/or description",
     "input_schema": {
         "type": "object",
         "properties": {
-            "user_id": {"type": "string"},
-            "task_id": {"type": "integer"},
-            "title": {"type": "string", "maxLength": 200},
-            "description": {"type": "string"},
+            "user_id": {"type": "string", "description": "The user's ID"},
+            "task_id": {"type": "integer", "description": "The ID of the task to update"},
+            "title": {
+                "type": "string",
+                "description": "New title for the task",
+                "maxLength": 200,
+            },
+            "description": {
+                "type": "string",
+                "description": "New description for the task",
+            },
         },
         "required": ["user_id", "task_id"],
     },
