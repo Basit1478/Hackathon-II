@@ -5,6 +5,7 @@ from app.config import get_settings
 
 settings = get_settings()
 
+# Async engine for FastAPI endpoints
 async_engine = create_async_engine(
     settings.database_url,
     echo=False,
@@ -18,8 +19,19 @@ AsyncSessionLocal = sessionmaker(
     expire_on_commit=False,
 )
 
-sync_database_url = settings.database_url.replace("postgresql+asyncpg://", "postgresql://")
-engine = create_engine(sync_database_url, echo=False, pool_size=5, max_overflow=10)
+# Sync engine for MCP tools (function_tool runs synchronously)
+# Convert async URL to sync URL
+sync_database_url = settings.database_url.replace(
+    "postgresql+asyncpg://",
+    "postgresql://"
+)
+
+engine = create_engine(
+    sync_database_url,
+    echo=False,
+    pool_size=5,
+    max_overflow=10,
+)
 
 
 async def get_session() -> AsyncSession:
